@@ -1,0 +1,31 @@
+{
+  "name": "bb-questions-e2e-sanity",
+  "version": "1.0.0",
+  "description": "Test bb-questions e2e on the same host",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "napa",
+    "tests": "node --harmony_destructuring index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanivel/bb-questions-e2e-sanity.git"
+  },
+  "author": "Yaniv Elimor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yanivel/bb-questions-e2e-sanity/issues"
+  },
+  "homepage": "https://github.com/yanivel/bb-questions-e2e-sanity#readme",
+  "devDependencies": {
+    "napa": "^2.3.0"
+  },
+  "napa": {
+    "bb-questions": "Bnei-Baruch/bb-questions"
+  },
+  "dependencies": {
+    "phantom": "^2.1.13",
+    "phantomjs-prebuilt": "^2.1.7"
+  }
+}
