@@ -12,14 +12,39 @@ module.exports = {
             })
             .then(page => {
                 sitepage = page;
-                return page.open(config.url);
+                sitepage.property('onInitialized', function () {
+                    sitepage.evaluate(function () {
+                        console.log('onInitialized');
+                        (function (w){
+                            var oldWS = w.WebSocket;
+                            w.WebSocket = function (uri) {
+                                this.ws = new oldWS(uri);
+                            };
+                            w.WebSocket.prototype.send = function (msg) {
+                                w.callPhantom({type: "ws", sent: "msg"});
+                                this.ws.send(msg);
+                            };
+                            console.log(w.WebSocket);
+                        })(window);
+                    });
+                });
+                sitepage.property('onCallback', function (data) {
+                    console.log(JSON.stringify(data, undefined, 4));
+                });
+            
+                sitepage.property('onConsoleMessage', function (msg) { console.log(msg); });
+                return sitepage.open(config.url);
             })
             .then(status => {
-                console.log(status);
-                return sitepage.property('content');
-            })
-            .then(content => {
-                console.log(content);
+                if (status === 'success') {
+                    console.log(status);                    
+                    sitepage.evaluate(function () {
+                        (function (w) {
+                            //var ws = w.WebSocket("wss://" + window.document.location.host + '/');
+                            //ws.send('test');
+                        })(window);
+                    });
+                }
                 sitepage.close();
                 phInstance.exit();
             })

@@ -1,5 +1,5 @@
 module.exports = {
     'same-host': {
-        url: 'https://stackoverflow.com/'
+        url: 'http://bb-questions.herokuapp.com/en'
     }
 };
