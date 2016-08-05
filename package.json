@@ -2,11 +2,11 @@
   "name": "bb-questions-e2e-sanity",
   "version": "1.0.0",
   "description": "Test bb-questions e2e on the same host",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel -w src -d build -s",
     "install": "napa",
-    "tests": "node --harmony_destructuring index"
+    "tests": "npm run build && npm run build/index"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/yanivel/bb-questions-e2e-sanity#readme",
   "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-preset-es2015": "^6.13.1",
+    "babel-preset-stage-0": "^6.5.0",
     "napa": "^2.3.0"
   },
   "napa": {
