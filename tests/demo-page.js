@@ -1,5 +1,6 @@
 var phantom = require('phantom');
 var config = require('../config')['demo-page'];
+var evaluateAssert = require('../utils').evaluateAssert;
 var assert = require('assert');
 
 module.exports = {
@@ -40,12 +41,14 @@ module.exports = {
             .then(status => {
                 if (status === 'success') {
                     console.log(status);
-
-                    sitepage.evaluate(function () {
-                        return typeof ClientQuestionMonitorLibrary === 'undefined';
-                    }).then((value) => assert(value, 'ClientQuestionMonitorLibrary should not be undefined'));
-                    // TODO: the above should stop execution..
-
+                    evaluateAssert(assert.ok, 'ClientQuestionMonitorLibrary should not be undefined', sitepage.evaluate, function () {
+                        (function (w) {
+                            assert.ok(typeof ClientQuestionMonitorLibrary === 'undefined', );
+                            console.log('wawawawax');
+                            // var ws = w.WebSocket("wss://" + window.document.location.host + '/');
+                            // ws.send('test');
+                        })(window);
+                    });
                 }
 
                 // sitepage.close();

@@ -6,11 +6,6 @@ function* entries(obj) {
    }
 }
 
-function evaluateAssert(assert, message, evaluator, evaluate, params = []) {
-    return assert(evaluator(evaluate, ...params), message);
-}
-
 module.exports = {
-    entries,
-    evaluateAssert
+    entries
 };
