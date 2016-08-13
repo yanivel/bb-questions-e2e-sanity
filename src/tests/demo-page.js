@@ -15,21 +15,7 @@ module.exports = {
             .then(page => {
                 sitepage = page;
                 sitepage.property('onInitialized', function () {
-                    sitepage.evaluate(function () {
-                        console.log('onInitialized');
-                        (function (w){
-                            console.log('wawa');
-                            // var oldWS = w.WebSocket;
-                            // w.WebSocket = function (uri) {
-                            //     this.ws = new oldWS(uri);
-                            // };
-                            // w.WebSocket.prototype.send = function (msg) {
-                            //     w.callPhantom({type: "ws", sent: "msg"});
-                            //     this.ws.send(msg);
-                            // };
-                            // console.log(w.WebSocket);
-                        })(window);
-                    });
+
                 });
                 sitepage.property('onCallback', function (data) {
                     console.log(JSON.stringify(data, undefined, 4));
@@ -43,11 +29,51 @@ module.exports = {
                     console.log(status);
 
                     return sitepage.evaluate(function () {
-                        return typeof ClientQuestionMonitorLibrary === 'undefined';
+                        return typeof ClientQuestionMonitorLibrary !== 'undefined';
                     }).then((value) => {
-                        assert(value, 'ClientQuestionMonitorLibrary should not be undefined');
+                        return assert(value, 'ClientQuestionMonitorLibrary should not be undefined');
                     });
                 }
+            })
+            .then(() => {
+                sitepage.evaluate(function () {
+                    (function (w) {
+                        w.isClientMonitorLibraryPatched = undefined;
+                        if (ClientQuestionMonitorLibrary) {
+                            w.isClientMonitorLibraryPatched = true;
+                            const oldOnMessage = ClientQuestionMonitorLibrary.onMessage;
+                            ClientQuestionMonitorLibrary.onMessage = function (data) {
+                                w.callPhantom({ type: 'ws-onMessage', received: data});
+                                oldOnMessage.call(this, data);
+                            };
+                        }
+                    })(window);
+                });
+            })
+            .then(() => {
+                return sitepage.evaluate(function () {
+                    return (function (w) {
+                        return w.isClientMonitorLibraryPatched === true;
+                    })(window);
+                }).then(value => {
+                    assert(value, 'ClientQuestionMonitorLibrary should be monkey patched');
+                });
+            })
+            .then(() => {
+                return sitepage.evaluate(function () {
+                    var time = (new Date()).getTime();
+                    document.querySelector('#question_name').value = 'name testing ws ' + time;
+                    document.querySelector('#question_from').value = 'from testing ws' + time;
+                    document.querySelector('#question_question').value = 'testing the ws? ' + time;
+                    document.querySelector('#new_question-form button[type="submit"]').click();
+                });
+            })
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    setTimeout(function () {
+                        reject('no ws success response');
+                    }, 5000);
+                });
             })
             .then(() => {
                 sitepage.close();
