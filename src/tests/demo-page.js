@@ -3,10 +3,11 @@ var config = require('../config')['demo-page'];
 var assert = require('assert');
 
 module.exports = {
+
     run() {
         var sitepage = null;
         var phInstance = null;
-        phantom.create()
+        return phantom.create()
             .then(instance => {
                 phInstance = instance;
                 return instance.createPage();
@@ -33,27 +34,29 @@ module.exports = {
                 sitepage.property('onCallback', function (data) {
                     console.log(JSON.stringify(data, undefined, 4));
                 });
-
                 sitepage.property('onConsoleMessage', function (msg) { console.log(msg); });
+
                 return sitepage.open(config.url);
             })
             .then(status => {
                 if (status === 'success') {
                     console.log(status);
 
-                    sitepage.evaluate(function () {
+                    return sitepage.evaluate(function () {
                         return typeof ClientQuestionMonitorLibrary === 'undefined';
-                    }).then((value) => assert(value, 'ClientQuestionMonitorLibrary should not be undefined'));
-                    // TODO: the above should stop execution..
-
+                    }).then((value) => {
+                        assert(value, 'ClientQuestionMonitorLibrary should not be undefined');
+                    });
                 }
-
-                // sitepage.close();
-                // phInstance.exit();
+            })
+            .then(() => {
+                sitepage.close();
+                phInstance.exit();
+                return false;
             })
             .catch(error => {
-                console.log(error);
                 phInstance.exit();
+                return error;
             });
     }
 };
