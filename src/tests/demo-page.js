@@ -2,12 +2,21 @@ var phantom = require('phantom');
 var config = require('../config')['demo-page'];
 var assert = require('assert');
 
+var flags = [
+    '--local-to-remote-url-access=yes',
+    '--cookies-file=cookies.txt',
+    '--web-security=false',
+    // '--debug=true',
+    '--ignore-ssl-errors=true'
+];
+
 module.exports = {
 
     run() {
         var sitepage = null;
         var phInstance = null;
-        return phantom.create()
+
+        return phantom.create(flags)
             .then(instance => {
                 phInstance = instance;
                 return instance.createPage();
@@ -49,13 +58,13 @@ module.exports = {
                 });
             })
             .then(() => sitepage.evaluate(sendQuestion))
-            // .then(() => {
-            //     return new Promise((resolve, reject) => {
-            //         setTimeout(function () {
-            //             reject('no ws success response');
-            //         }, 5000);
-            //     });
-            // })
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    setTimeout(function () {
+                        reject('no ws success response');
+                    }, 5000);
+                });
+            })
             .then(() => {
                 sitepage.close();
                 phInstance.exit();
@@ -83,6 +92,7 @@ function sendQuestion(name, from, question) {
     console.log('question: ' + document.querySelector('#question_question').value);
 
     document.querySelector('#new_question-form button[type="submit"]').click();
+    return true;
 }
 
 function monkeyPatchClientMonitor() {
